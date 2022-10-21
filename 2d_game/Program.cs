@@ -13,8 +13,10 @@ Texture2D gameBackground = Raylib.LoadTexture("gamebackground.png");
 
 
 Rectangle character = new Rectangle(0, 0, avatarImage.width, avatarImage.height);
-Rectangle enemy = new Rectangle(700, 500, 96, 96);
+Rectangle enemyRect = new Rectangle(700, 500, 96, 96);
 
+Vector2 enemyMovement = new Vector2(1, 0);
+float enemySpeed = 2;
 
 //////////////////////////////////////////////////////////////////////////////////////
 while(!Raylib.WindowShouldClose()){
@@ -22,6 +24,8 @@ while(!Raylib.WindowShouldClose()){
     //LOGIK
 
     if (currentScene == "start"){
+        character.x = 0;
+        character.y = 0;
         if (Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
         {
             currentScene = "game";
@@ -47,8 +51,24 @@ while(!Raylib.WindowShouldClose()){
         character.y -= speed;
         }
 
-        if (Raylib.CheckCollisionRecs(character, enemy)){
+        Vector2 playerPos = new Vector2(character.x, character.y);
+        Vector2 enemyPos = new Vector2(enemyRect.x, enemyRect.y);
+        Vector2 diff = playerPos - enemyPos;
+        Vector2 enemyDirection = Vector2.Normalize(diff);
+
+
+        enemyMovement = enemyDirection * enemySpeed;
+
+        enemyRect.x += enemyMovement.X;
+        enemyRect.y += enemyMovement.Y;
+
+        if (Raylib.CheckCollisionRecs(character, enemyRect)){
             currentScene = "gameOver";
+        }
+    }
+    else if (currentScene == "gameOver"){
+        if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE)){
+            currentScene = "start";
         }
     }
 
@@ -65,7 +85,7 @@ while(!Raylib.WindowShouldClose()){
                 (int)character.y,
                 Color.WHITE
             );
-        Raylib.DrawRectangleRec(enemy, Color.RED);
+        Raylib.DrawRectangleRec(enemyRect, Color.RED);
     }
     else if (currentScene == "start")
     {
